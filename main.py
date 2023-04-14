@@ -69,7 +69,7 @@ def generate_graph():
            #print(f"  -> Neighbor {neighbor} (cost {cost})")#g = draw_graph_on_image(graph, ci)
     #g = draw_graph_on_image(graph,ci)
     #print(snake)
-    return graph, snake, fruit
+    return graph, fruit
 
 '''
 def draw_graph_on_image(graph, image_path):
@@ -97,10 +97,10 @@ while True:
     canvas_image = Image.open(io.BytesIO(canvas_png))
     box = (28, 25, width, height)
     ci = canvas_image.crop(box)
-    snake_position(ci)
+    snake = snake_position(ci)
     # Mostrar la imagen resultante
     pixels = ci.load()
-    ci.show()
+    #ci.show()
 
     current_image = np.array(ci)
     if previous_image is not None:
@@ -108,13 +108,15 @@ while True:
 
         difference = np.sum(np.abs(current_image - previous_image))
         
-        if difference != 0:
-            print("El canvas ha cambiado")
+        #if difference != 0:
+            #print("El canvas ha cambiado")
 
         # Guardar la imagen actual para la próxima comparación
         previous_image = ci
-
-        graph, snake, fruit = generate_graph()
+        try:
+            graph, fruit = generate_graph()
+        except:
+            continue
         print ("snake: ", snake)
         print ("fruit: ", fruit)
         if fruit is not None:
