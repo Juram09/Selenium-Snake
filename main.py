@@ -8,7 +8,7 @@ import io
 import base64
 import cv2
 import numpy as np
-from calculate_direction import move, a_star
+from calculate_direction import move, a_star,calculate_direction
 from PIL import Image, ImageFilter
 import numpy as np
 from Coordenadas_Snake import snake_position
@@ -51,10 +51,6 @@ def generate_graph():
            #print(x//32,y//32, r,g,b)
            if ((r < 215 or r > 230) and (g < 105 or g > 140)):
             node = (x // cell_size, y // cell_size)
-            if (r == 255 and g == 255 and b == 255):
-                snake = node
-            elif (r == 231 and g == 71 and b == 29):
-                fruit = node
             graph[node] = {} 
                 # Check the neighboring cells to find connections
             for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
@@ -70,7 +66,7 @@ def generate_graph():
            #print(f"  -> Neighbor {neighbor} (cost {cost})")#g = draw_graph_on_image(graph, ci)
     #g = draw_graph_on_image(graph,ci)
     #print(snake)
-    return graph, fruit
+    return graph
 
 
 def draw_graph_on_image(graph, image_path):
@@ -89,17 +85,17 @@ def draw_graph_on_image(graph, image_path):
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
-
+previous_move="right"
 while True:
     width = 18*cell_size-4
-    height = 16*cell_size+4
+    height = 16*cell_size-7
     canvas_base64 = driver.execute_script("return arguments[0].toDataURL('image/png').substring(21);", canvas)
     canvas_png = base64.b64decode(canvas_base64)
     canvas_image = Image.open(io.BytesIO(canvas_png))
     box = (28, 25, width, height)
     ci = canvas_image.crop(box)
     snake = snake_position(ci)
-    fruit =find_food(ci, width, height)
+    fruit = find_food(ci)
     # Mostrar la imagen resultante
     pixels = ci.load()
     #ci.show()
@@ -115,10 +111,7 @@ while True:
 
         # Guardar la imagen actual para la próxima comparación
         previous_image = ci
-        try:
-            graph, fruit = generate_graph()
-        except:
-            continue
+        graph = generate_graph()
         print ("snake: ", snake)
         print ("fruit: ", fruit)
         if fruit is not None:
@@ -127,7 +120,9 @@ while True:
                     #direction = calculate_direction(direction, snake_position, food_position)
                         astar=a_star(graph, snake, fruit)
                     #print(astar)
-                        previous_move = move(previous_move, astar, snake)
+                        previous_move = move(previous_move,astar,snake)
+                        #previous_move = calculate_direction(snake, fruit, previous_move)
+                        print(previous_move)
                     except:
                         continue
                 #pyautogui.press(direction)
@@ -139,10 +134,23 @@ while True:
             print("No se encontró comida en la imagen.")
         # Emitir una orden de movimiento a la serpiente para que se mueva en la dirección adecuada
     previous_image = ci
-
+    if previous_move == "right":
+        ActionChains(driver)\
+        .key_down(Keys.ARROW_RIGHT)\
+        .perform()
+    elif previous_move == "left":
+        ActionChains(driver)\
+        .key_down(Keys.ARROW_LEFT)\
+        .perform()
+    elif previous_move == "up":
+        ActionChains(driver)\
+        .key_down(Keys.ARROW_UP)\
+        .perform()
+    elif previous_move == "down":
+        ActionChains(driver)\
+        .key_down(Keys.ARROW_DOWN)\
+        .perform()
 # Dibujar la cuadrícula en el canvas
-    
-driver.execute_script()
 
 # Esperar un momento para ver la cuadrícula
 time.sleep(5)

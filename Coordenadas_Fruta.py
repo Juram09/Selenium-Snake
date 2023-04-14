@@ -1,9 +1,9 @@
-import pyautogui
+#import pyautogui
 import cv2
 import numpy as np
 
 cell_size = 32
-def find_food(ci, width,height):
+def find_food(ci):
 
       # Convertir la imagen a formato HSV
     hsv_image = cv2.cvtColor(np.array(ci), cv2.COLOR_BGR2HSV)
@@ -28,16 +28,14 @@ def find_food(ci, width,height):
     # Si se detectó un contorno, devolver la posición de su centro
     if len(contours) > 0:
         #print(contours)
-        largest_contour = min(contours, key=cv2.contourArea)
+        largest_contour = max(contours, key=cv2.contourArea)
         moments = cv2.moments(largest_contour)
         #print(moments)
         if moments['m00'] > 0:
             cx = int(moments['m10'] / moments['m00'])
             cy = int(moments['m01'] / moments['m00'])
-            for x in range(width):
-                for y in range(height):# Red pixel for the fruit
-                    fruit_position = (cx // cell_size, cy // cell_size)
-                    return fruit_position
+            fruit_position = (cx // cell_size, cy // cell_size)
+            return fruit_position
     
     # Si no se detectó ningún contorno, devolver None
     return None

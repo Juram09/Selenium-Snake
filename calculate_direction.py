@@ -1,5 +1,50 @@
 from queue import PriorityQueue
 import numpy as np
+
+def calculate_direction(snake_position, food_position, previous_move):
+    # Obtener la posición de la cabeza de la serpiente y la comida
+    x1, y1 = snake_position
+    x2, y2 = food_position
+
+    # Calcular la diferencia entre las posiciones
+    dx, dy = x2 - x1, y2 - y1
+
+    # Seleccionar la dirección con la mayor diferencia absoluta
+    if abs(dx) > abs(dy):
+        if dx > 0:
+            if (previous_move != "left"):
+                return 'right'
+            else:
+                if dy > 0:
+                    return 'down'
+                else:
+                    return 'up'
+        else:
+            if (previous_move != "right"):
+                return 'left'
+            else:
+                if dy > 0:
+                    return 'down'
+                else:
+                    return 'up'
+    else:
+        if dy > 0:
+            if (previous_move != "up"):
+                return 'down'
+            else:
+                if dx > 0:
+                    return 'right'
+                else:
+                    return 'left'
+        else:
+            if (previous_move != "down"):
+                return 'up'
+            else:
+                if dx > 0:
+                    return 'right'
+                else:
+                    return 'left'
+        
 def a_star(graph, start, goal):
     # Creamos una cola de prioridad y agregamos el nodo inicial con una prioridad de 0
     queue = PriorityQueue()
@@ -70,7 +115,4 @@ def move(previous_move, path, start):
             previous_move="up"
         print(previous_move)
         print(node)
-        #pyautogui.press(previous_move)
-        #time.sleep(0.001)
-    print("crunch")
     return(previous_move)
