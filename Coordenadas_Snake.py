@@ -16,8 +16,8 @@ cell_size = 32
 def snake_position(ci):
     # Convertir la imagen a formato HSV
     hsv_image = cv2.cvtColor(np.array(ci), cv2.COLOR_RGB2HSV)
-    lower_orange = np.array([0, 0, 0])
-    upper_orange = np.array([100, 255, 255])
+    lower_orange = np.array([0, 0, 200])
+    upper_orange = np.array([255, 20, 255])
     # Crear una máscara que detecte los colores dentro de los límites especificados
     mask = cv2.inRange(hsv_image, lower_orange, upper_orange)
     # Detectar los bordes en la imagen usando el operador Canny

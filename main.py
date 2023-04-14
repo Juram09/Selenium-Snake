@@ -118,10 +118,10 @@ while True:
                 #direction = a_star(graph, snake_position, food_position)
                     try:
                     #direction = calculate_direction(direction, snake_position, food_position)
-                        astar=a_star(graph, snake, fruit)
+                        #astar=a_star(graph, snake, fruit)
                     #print(astar)
-                        previous_move = move(previous_move,astar,snake)
-                        #previous_move = calculate_direction(snake, fruit, previous_move)
+                        #previous_move = move(previous_move,astar)
+                        previous_move = calculate_direction(snake, fruit, previous_move)
                         print(previous_move)
                     except:
                         continue
