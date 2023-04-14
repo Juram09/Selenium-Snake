@@ -9,7 +9,9 @@ import base64
 import cv2
 import numpy as np
 from calculate_direction import move, a_star
-
+from PIL import Image, ImageFilter
+import numpy as np
+from Coordenadas_Snake import snake_position
 # Inicializar el navegador
 driver = webdriver.Chrome()
 
@@ -86,6 +88,7 @@ def draw_graph_on_image(graph, image_path):
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 '''
+
 while True:
     width = 18*cell_size-4
     height = 16*cell_size-7
@@ -94,6 +97,8 @@ while True:
     canvas_image = Image.open(io.BytesIO(canvas_png))
     box = (28, 25, width, height)
     ci = canvas_image.crop(box)
+    snake_position(ci)
+    # Mostrar la imagen resultante
     pixels = ci.load()
     ci.show()
 
