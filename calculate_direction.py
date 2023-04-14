@@ -68,7 +68,7 @@ def a_star(graph, start, goal):
                 path.append(current_node)
                 current_node = visited[current_node]
             return list(reversed(path))
-        
+        #print(graph[current_node].items())
         # Expandimos el nodo actual y revisamos sus vecinos
         for neighbor, weight in graph[current_node].items():
             # Si el vecino no es transitble, lo ignoramos
@@ -105,14 +105,38 @@ def move(previous_move, path, start):
         start = node
         
         # Enviar la tecla de flecha correspondiente para mover la serpiente en la dirección adecuada
-        if dx == 1 and previous_move!="left":
-            previous_move="right"
-        elif dx == -1 and previous_move!="right":
-            previous_move="left"
-        elif dy == 1 and previous_move!="up":
-            previous_move="down"
-        elif dy == -1 and  previous_move!="down":
-            previous_move="up"
-        print(previous_move)
-        print(node)
+        if dx == 1:
+            if previous_move!="left":
+                previous_move="right"
+            else:
+                if dy == 1:
+                    previous_move="down"
+                else:
+                    previous_move="up"
+        elif dx == -1:
+            if previous_move != "right":
+                previous_move="left"
+            else:
+                if dy == 1:
+                    previous_move="down"
+                else:
+                    previous_move="up"
+        elif dy == 1:
+            if previous_move != "up":
+               previous_move = "down"
+            else:
+                if dx == 1:
+                    previous_move="right"
+                else:
+                    previous_move ="left"
+        elif dy == -1:
+            if previous_move!="down":
+                previous_move="up"
+            else:
+                if dx == 1:
+                    previous_move="right"
+                else:
+                    previous_move ="left"
+        #print(previous_move)
+        #print(node)
     return(previous_move)

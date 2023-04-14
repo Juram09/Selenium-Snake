@@ -47,21 +47,18 @@ def generate_graph():
     # Loop through the cells and add nodes to the graph
     for x in range(cell_size // 2, width-32, cell_size):
         for y in range(cell_size // 2, height-32, cell_size-1):
-           r, g, b, a = pixels[x, y]
-           #print(x//32,y//32, r,g,b)
-           if ((r < 215 or r > 230) and (g < 105 or g > 140)):
             node = (x // cell_size, y // cell_size)
-            graph[node] = {} 
+            if (node not in body_list or node == body_list[0]):
+                graph[node] = {} 
                 # Check the neighboring cells to find connections
             for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
                 nx, ny = x + dx * cell_size, y + dy * cell_size
                 if 0 <= nx < width-32 and 0 <= ny < height-32:
-                    r, g, b, a = pixels[nx, ny]
-                    if ((r < 215 or r > 240) and (g < 105 or g > 140)):
-                        neighbor = (nx // cell_size, ny // cell_size)
+                    neighbor = (nx // cell_size, ny // cell_size)
+                    if (node not in body_list or node == body_list[0]):
                         graph[node][neighbor] = 1
     #for node, neighbors in graph.items():
-        #print(f"Node {node}:")
+    #    print(f"Node {node}:")
         #for neighbor, cost in neighbors.items():
            #print(f"  -> Neighbor {neighbor} (cost {cost})")#g = draw_graph_on_image(graph, ci)
     #g = draw_graph_on_image(graph,ci)
@@ -85,7 +82,10 @@ def draw_graph_on_image(graph, image_path):
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
-previous_move="right"
+previous_move = "right"
+snake_length = 3
+previous_fruit = (12,7)
+body_list= [(0,0),(0,0),(0,0)]
 while True:
     width = 18*cell_size-4
     height = 16*cell_size-7
@@ -95,7 +95,15 @@ while True:
     box = (28, 25, width, height)
     ci = canvas_image.crop(box)
     snake = snake_position(ci)
+    print(snake)
+    if (snake not in body_list):
+        for i in range (len(body_list)-1, 0, -1):
+            body_list[i] = body_list[i-1]
+        body_list[0] = snake
+    print(body_list, len(body_list))
     fruit = find_food(ci)
+    if fruit != previous_fruit:
+        snake_length += 1
     # Mostrar la imagen resultante
     pixels = ci.load()
     #ci.show()
@@ -115,14 +123,14 @@ while True:
         print ("snake: ", snake)
         print ("fruit: ", fruit)
         if fruit is not None:
-                #direction = a_star(graph, snake_position, food_position)
+                #direction = a_star(graph,snake_position, fruit)
                     try:
+                        astar=a_star(graph, snake, fruit)
                     #direction = calculate_direction(direction, snake_position, food_position)
-                        #astar=a_star(graph, snake, fruit)
-                    #print(astar)
-                        #previous_move = move(previous_move,astar)
-                        previous_move = calculate_direction(snake, fruit, previous_move)
-                        print(previous_move)
+                        #print(astar)
+                        previous_move = move(previous_move,astar,snake)
+                     #   previous_move = calculate_direction(snake, fruit, previous_move)
+                      #  print(previous_move)
                     except:
                         continue
                 #pyautogui.press(direction)
