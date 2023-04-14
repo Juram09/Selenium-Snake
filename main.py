@@ -12,6 +12,7 @@ from calculate_direction import move, a_star
 from PIL import Image, ImageFilter
 import numpy as np
 from Coordenadas_Snake import snake_position
+from Coordenadas_Fruta import find_food
 # Inicializar el navegador
 driver = webdriver.Chrome()
 
@@ -71,7 +72,7 @@ def generate_graph():
     #print(snake)
     return graph, fruit
 
-'''
+
 def draw_graph_on_image(graph, image_path):
     # Load the original image
     image = image_path
@@ -87,17 +88,18 @@ def draw_graph_on_image(graph, image_path):
     cv2.imshow('Game Image', img)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
-'''
+
 
 while True:
     width = 18*cell_size-4
-    height = 16*cell_size-7
+    height = 16*cell_size+4
     canvas_base64 = driver.execute_script("return arguments[0].toDataURL('image/png').substring(21);", canvas)
     canvas_png = base64.b64decode(canvas_base64)
     canvas_image = Image.open(io.BytesIO(canvas_png))
     box = (28, 25, width, height)
     ci = canvas_image.crop(box)
     snake = snake_position(ci)
+    fruit =find_food(ci, width, height)
     # Mostrar la imagen resultante
     pixels = ci.load()
     #ci.show()
