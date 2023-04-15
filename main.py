@@ -113,7 +113,7 @@ while True:
         snake_length += 1
         previous_fruit = fruit
     if (snake not in snake_position_list and snake!=None):
-        if len(snake_position_list)!=snake_length:
+        if len(snake_position_list)<snake_length:
             snake_position_list.append(snake)
         else:
             for i in range (1, len(snake_position_list)):

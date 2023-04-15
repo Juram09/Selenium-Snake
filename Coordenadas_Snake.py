@@ -11,7 +11,6 @@ import numpy as np
 from calculate_direction import move, a_star
 from PIL import Image, ImageFilter
 import numpy as np
-import gym
 
 
 cell_size=32
@@ -33,11 +32,11 @@ def snake_position(ci):
         if moments['m00'] > 0:
             cx = int(moments['m10'] / moments['m00'])
             cy = int(moments['m01'] / moments['m00'])
-        #cv2.circle(mask, (cx, cy), 5, (255, 255, 255),-1)
-        #cv2.circle(mask, (cx, cy), 2, (255, 255, 255))
-        #cv2.imshow('Game Image', mask)
-        #cv2.waitKey(0)
-        #cv2.destroyAllWindows()
+        cv2.circle(mask, (cx, cy), 5, (255, 255, 255),-1)
+        cv2.circle(mask, (cx, cy), 2, (255, 255, 255))
+        cv2.imshow('Game Image', mask)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
         snake_head_position = (cx // cell_size, cy // cell_size)
         return snake_head_position
     

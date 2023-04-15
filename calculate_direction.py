@@ -16,38 +16,86 @@ def calculate_direction(snake_position, food_position, previous_move, snake_body
     # Seleccionar la dirección con la mayor diferencia absoluta
     if abs(dx) > abs(dy):
         if dx > 0:
-            if (previous_move != "left") and ((x1+1, y1) not in snake_body):
-                return 'right'
-            else:
-                if dy > 0 and ((x1, y1+1) not in snake_body):
-                    return 'down'
+            if ((x1+1, y1) not in snake_body):
+                if (previous_move != "left"):
+                    return 'right'
                 else:
-                    return 'up' if ((x1, y1-1) not in snake_body) else 'right'
+                    if ((x1, y1+1) not in snake_body and previous_move != "up"):
+                        return "down"
+                    elif (previous_move != "down"):
+                        return "up"
+            else:
+                if dy > 0:
+                    if ((x1, y1+1) not in snake_body and previous_move != "up"):
+                        return 'down'
+                    elif (previous_move != "down"):
+                        return "up"
+                else:
+                    if ((x1, y1-1) not in snake_body and previous_move != "down"):
+                        return 'up'
+                    elif (previous_move != "up"):
+                        return "down"
         else:
-            if (previous_move != "right") and ((x1-1, y1) not in snake_body):
-                return 'left'
-            else:
-                if dy > 0 and ((x1, y1+1) not in snake_body):
-                    return 'down'
+            if ((x1-1, y1) not in snake_body):
+                if (previous_move != "right"):
+                    return 'left'
                 else:
-                    return 'up' if ((x1, y1-1) not in snake_body) else 'left'
+                    if ((x1, y1+1) not in snake_body and previous_move != "up"):
+                        return "down"
+                    elif (previous_move != "down"):
+                        return "up"
+            else:
+                if dy > 0:
+                    if ((x1, y1+1) not in snake_body and (previous_move != "up")):
+                        return 'down'
+                    elif (previous_move != "down"):
+                        return "up"
+                else:
+                    if ((x1, y1-1) not in snake_body and (previous_move != "down")):
+                        return 'up'
+                    elif (previous_move != "up"):
+                        return "down"
     else:
         if dy > 0:
-            if (previous_move != "up") and ((x1, y1+1) not in snake_body):
-                return 'down'
-            else:
-                if dx > 0 and ((x1+1, y1) not in snake_body):
-                    return 'right'
+            if ((x1, y1+1) not in snake_body):
+                if (previous_move != "up"):
+                    return 'down'
                 else:
-                    return 'left' if ((x1-1, y1) not in snake_body) else 'down'
+                    if ((x1+1, y1) not in snake_body and (previous_move != "left")):
+                        return "right"
+                    elif (previous_move != "right"):
+                        return "left"
+            else:
+                if dx > 0:
+                    if ((x1+1, y1) not in snake_body and (previous_move != "left")):
+                        return 'right'
+                    elif (previous_move != "right"):
+                        return "left"
+                else:
+                    if ((x1-1, y1) not in snake_body) and (previous_move != "right"):
+                        return 'left'
+                    elif (previous_move != "left"):
+                        return "right"
         else:
-            if (previous_move != "down") and ((x1, y1-1) not in snake_body):
-                return 'up'
-            else:
-                if dx > 0 and ((x1+1, y1) not in snake_body):
-                    return 'right'
+            if ((x1, y1-1) not in snake_body):
+                if (previous_move != "down"):
+                    return 'up'
                 else:
-                    return 'left' if ((x1-1, y1) not in snake_body) else 'up'
+                    if ((x1+1, y1) not in snake_body and (previous_move != "left")):
+                        return "right"
+                    elif (previous_move != "right"):
+                        return "left"
+            else:
+                if dx > 0:
+                    if ((x1+1, y1) not in snake_body and (previous_move != "left")):
+                        return 'right'
+                    elif (previous_move != "right"):
+                        return "left"
+                else:
+                    if ((x1-1, y1) not in snake_body and (previous_move != "right")):
+                        return 'left'
+                    elif (previous_move != "left"):
+                        return "right"
 
 
 
