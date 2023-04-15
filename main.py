@@ -40,6 +40,8 @@ previous_image = None
 snake_length =3
 previous_fruit = (12,7)
 snake_position_list = []
+previous_snake = None
+previous_fruit = None
 cell_size = 32
 def generate_graph():
     # Define the dimensions of the board and the cell size
@@ -112,13 +114,33 @@ while True:
     if fruit != previous_fruit:
         snake_length += 1
         previous_fruit = fruit
-    if (snake not in snake_position_list and snake!=None):
-        if len(snake_position_list)<snake_length:
+
+    if snake is not None and snake != previous_snake:
+        if len(snake_position_list) < snake_length:
             snake_position_list.append(snake)
         else:
-            for i in range (1, len(snake_position_list)):
-                snake_position_list[i-1] = snake_position_list[i]
-            snake_position_list[len(snake_position_list)-1]=snake
+            # Mover todas las posiciones hacia la izquierda, eliminando el primer elemento
+            snake_position_list.pop(0)
+            snake_position_list.append(snake)
+
+        if previous_snake is not None:
+            if snake[0] != previous_snake[0]:
+                # Añadir la nueva posición en el eje y
+                y_range = range(min(previous_snake[1], snake[1]), max(previous_snake[1], snake[1])+1)
+                for y in y_range:
+                    position = (snake[0], y)
+                    if position not in snake_position_list:
+                        snake_position_list.append(position)
+            elif snake[1] != previous_snake[1]:
+                # Añadir la nueva posición en el eje x
+                x_range = range(min(previous_snake[0], snake[0]), max(previous_snake[0], snake[0])+1)
+                for x in x_range:
+                    position = (x, snake[1])
+                    if position not in snake_position_list:
+                        snake_position_list.append(position)
+
+        previous_snake = snake
+
     # Mostrar la imagen resultante
     pixels = ci.load()
     #ci.show()
@@ -175,6 +197,7 @@ while True:
         ActionChains(driver)\
         .key_down(Keys.ARROW_DOWN)\
         .perform()
+
 # Dibujar la cuadrícula en el canvas
 
 # Esperar un momento para ver la cuadrícula
