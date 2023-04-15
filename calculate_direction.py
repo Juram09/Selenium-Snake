@@ -3,100 +3,71 @@ import numpy as np
 import numpy as np
 import numpy as np
 
-
 def calculate_direction(snake_position, food_position, previous_move, snake_body):
     print(snake_body)
     # Obtener la posición de la cabeza de la serpiente y la comida
     x1, y1 = snake_position
     x2, y2 = food_position
-
+    board_width=17
+    board_height=15
     # Calcular la diferencia entre las posiciones
     dx, dy = x2 - x1, y2 - y1
 
     # Seleccionar la dirección con la mayor diferencia absoluta
     if abs(dx) > abs(dy):
         if dx > 0:
-            if ((x1+1, y1) not in snake_body):
-                if (previous_move != "left"):
+            if x1 < board_width - 1 and ((x1+1, y1) not in snake_body):
+                if previous_move != "left":
                     return 'right'
-                else:
-                    if ((x1, y1+1) not in snake_body and previous_move != "up"):
-                        return "down"
-                    elif (previous_move != "down"):
-                        return "up"
             else:
-                if dy > 0:
-                    if ((x1, y1+1) not in snake_body and previous_move != "up"):
-                        return 'down'
-                    elif (previous_move != "down"):
-                        return "up"
-                else:
-                    if ((x1, y1-1) not in snake_body and previous_move != "down"):
-                        return 'up'
-                    elif (previous_move != "up"):
-                        return "down"
-        else:
-            if ((x1-1, y1) not in snake_body):
-                if (previous_move != "right"):
+                if y1 < board_height - 1 and ((x1, y1+1) not in snake_body):
+                    return 'down'
+                elif y1 > 0 and ((x1, y1-1) not in snake_body):
+                    return 'up'
+                elif x1 > 0 and ((x1-1, y1) not in snake_body):
                     return 'left'
                 else:
-                    if ((x1, y1+1) not in snake_body and previous_move != "up"):
-                        return "down"
-                    elif (previous_move != "down"):
-                        return "up"
+                    return 'up'
+        else:
+            if x1 > 0 and ((x1-1, y1) not in snake_body):
+                if previous_move != "right":
+                    return 'left'
             else:
-                if dy > 0:
-                    if ((x1, y1+1) not in snake_body and (previous_move != "up")):
-                        return 'down'
-                    elif (previous_move != "down"):
-                        return "up"
+                if y1 < board_height - 1 and ((x1, y1+1) not in snake_body):
+                    return 'down'
+                elif y1 > 0 and ((x1, y1-1) not in snake_body):
+                    return 'up'
+                elif x1 < board_width - 1 and ((x1+1, y1) not in snake_body):
+                    return 'right'
                 else:
-                    if ((x1, y1-1) not in snake_body and (previous_move != "down")):
-                        return 'up'
-                    elif (previous_move != "up"):
-                        return "down"
+                    return 'up'
     else:
         if dy > 0:
-            if ((x1, y1+1) not in snake_body):
-                if (previous_move != "up"):
+            if y1 < board_height - 1 and ((x1, y1+1) not in snake_body):
+                if previous_move != "up":
                     return 'down'
-                else:
-                    if ((x1+1, y1) not in snake_body and (previous_move != "left")):
-                        return "right"
-                    elif (previous_move != "right"):
-                        return "left"
             else:
-                if dx > 0:
-                    if ((x1+1, y1) not in snake_body and (previous_move != "left")):
-                        return 'right'
-                    elif (previous_move != "right"):
-                        return "left"
-                else:
-                    if ((x1-1, y1) not in snake_body) and (previous_move != "right"):
-                        return 'left'
-                    elif (previous_move != "left"):
-                        return "right"
-        else:
-            if ((x1, y1-1) not in snake_body):
-                if (previous_move != "down"):
+                if x1 < board_width - 1 and ((x1+1, y1) not in snake_body):
+                    return 'right'
+                elif x1 > 0 and ((x1-1, y1) not in snake_body):
+                    return 'left'
+                elif y1 > 0 and ((x1, y1-1) not in snake_body):
                     return 'up'
                 else:
-                    if ((x1+1, y1) not in snake_body and (previous_move != "left")):
-                        return "right"
-                    elif (previous_move != "right"):
-                        return "left"
+                    return 'left'
+        else:
+            if y1 > 0 and ((x1, y1-1) not in snake_body):
+                if previous_move != "down":
+                    return 'up'
             else:
-                if dx > 0:
-                    if ((x1+1, y1) not in snake_body and (previous_move != "left")):
-                        return 'right'
-                    elif (previous_move != "right"):
-                        return "left"
+                if x1 < board_width - 1 and ((x1+1, y1) not in snake_body):
+                    return 'right'
+                elif x1 > 0 and ((x1-1, y1) not in snake_body):
+                    return 'left'
+                elif y1 < board_height - 1 and ((x1, y1+1) not in snake_body):
+                    return 'down'
                 else:
-                    if ((x1-1, y1) not in snake_body and (previous_move != "right")):
-                        return 'left'
-                    elif (previous_move != "left"):
-                        return "right"
-
+                    return 'left'
 
 
 def a_star(graph, start, goal):
