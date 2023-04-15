@@ -11,7 +11,10 @@ import numpy as np
 from calculate_direction import move, a_star
 from PIL import Image, ImageFilter
 import numpy as np
-cell_size = 32
+import gym
+
+
+cell_size=32
 
 def snake_position(ci):
     # Convertir la imagen a formato HSV
@@ -37,6 +40,6 @@ def snake_position(ci):
         #cv2.destroyAllWindows()
         snake_head_position = (cx // cell_size, cy // cell_size)
         return snake_head_position
+    
     # Si no se detectó ningún contorno, devolver None
     return None
- 

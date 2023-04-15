@@ -1,7 +1,11 @@
 from queue import PriorityQueue
 import numpy as np
+import numpy as np
+import numpy as np
 
-def calculate_direction(snake_position, food_position, previous_move):
+
+def calculate_direction(snake_position, food_position, previous_move, snake_body):
+    print(snake_body)
     # Obtener la posición de la cabeza de la serpiente y la comida
     x1, y1 = snake_position
     x2, y2 = food_position
@@ -12,39 +16,41 @@ def calculate_direction(snake_position, food_position, previous_move):
     # Seleccionar la dirección con la mayor diferencia absoluta
     if abs(dx) > abs(dy):
         if dx > 0:
-            if (previous_move != "left"):
+            if (previous_move != "left") and ((x1+1, y1) not in snake_body):
                 return 'right'
             else:
-                if dy > 0:
+                if dy > 0 and ((x1, y1+1) not in snake_body):
                     return 'down'
                 else:
-                    return 'up'
+                    return 'up' if ((x1, y1-1) not in snake_body) else 'right'
         else:
-            if (previous_move != "right"):
+            if (previous_move != "right") and ((x1-1, y1) not in snake_body):
                 return 'left'
             else:
-                if dy > 0:
+                if dy > 0 and ((x1, y1+1) not in snake_body):
                     return 'down'
                 else:
-                    return 'up'
+                    return 'up' if ((x1, y1-1) not in snake_body) else 'left'
     else:
         if dy > 0:
-            if (previous_move != "up"):
+            if (previous_move != "up") and ((x1, y1+1) not in snake_body):
                 return 'down'
             else:
-                if dx > 0:
+                if dx > 0 and ((x1+1, y1) not in snake_body):
                     return 'right'
                 else:
-                    return 'left'
+                    return 'left' if ((x1-1, y1) not in snake_body) else 'down'
         else:
-            if (previous_move != "down"):
+            if (previous_move != "down") and ((x1, y1-1) not in snake_body):
                 return 'up'
             else:
-                if dx > 0:
+                if dx > 0 and ((x1+1, y1) not in snake_body):
                     return 'right'
                 else:
-                    return 'left'
-        
+                    return 'left' if ((x1-1, y1) not in snake_body) else 'up'
+
+
+
 def a_star(graph, start, goal):
     # Creamos una cola de prioridad y agregamos el nodo inicial con una prioridad de 0
     queue = PriorityQueue()

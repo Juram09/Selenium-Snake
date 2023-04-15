@@ -8,10 +8,10 @@ import io
 import base64
 import cv2
 import numpy as np
-from calculate_direction import move, a_star,calculate_direction
+from calculate_direction import *
 from PIL import Image, ImageFilter
 import numpy as np
-from Coordenadas_Snake import snake_position
+from Coordenadas_Snake import *
 from Coordenadas_Fruta import find_food
 # Inicializar el navegador
 driver = webdriver.Chrome()
@@ -37,7 +37,9 @@ previous_image = None
 # Definir el tamaño de la cuadrícula y el tamaño de cada celda
 
 #cell_size = 32
-
+snake_length =3
+previous_fruit = (12,7)
+snake_position_list = []
 cell_size = 32
 def generate_graph():
     # Define the dimensions of the board and the cell size
@@ -84,6 +86,16 @@ def draw_graph_on_image(graph, image_path):
     cv2.imshow('Game Image', img)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
+def find_snake_pixels(ci):
+    pixels = ci.load()
+    snake_pixels = []
+    for x in range(ci.width):
+        for y in range(ci.height):
+            r, g, b, a = pixels[x, y]
+            if r == 0 and g == 255 and b == 0:
+                snake_pixels.append((x, y))
+    return snake_pixels
+
 
 previous_move="right"
 while True:
@@ -95,7 +107,18 @@ while True:
     box = (28, 25, width, height)
     ci = canvas_image.crop(box)
     snake = snake_position(ci)
+    snake_pixel=find_snake_pixels(ci)
     fruit = find_food(ci)
+    if fruit != previous_fruit:
+        snake_length += 1
+        previous_fruit = fruit
+    if (snake not in snake_position_list and snake!=None):
+        if len(snake_position_list)!=snake_length:
+            snake_position_list.append(snake)
+        else:
+            for i in range (1, len(snake_position_list)):
+                snake_position_list[i-1] = snake_position_list[i]
+            snake_position_list[len(snake_position_list)-1]=snake
     # Mostrar la imagen resultante
     pixels = ci.load()
     #ci.show()
@@ -121,8 +144,10 @@ while True:
                         #astar=a_star(graph, snake, fruit)
                     #print(astar)
                         #previous_move = move(previous_move,astar)
-                        previous_move = calculate_direction(snake, fruit, previous_move)
+                        previous_move = calculate_direction(snake, fruit, previous_move,snake_position_list)
+                        
                         print(previous_move)
+                       
                     except:
                         continue
                 #pyautogui.press(direction)
