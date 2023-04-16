@@ -2,6 +2,8 @@ from queue import PriorityQueue
 import numpy as np
 import numpy as np
 import numpy as np
+import networkx as nx
+
 def calculate_direction(snake_position, food_position, previous_move, snake_body):
     print(snake_body)
     # Obtener la posición de la cabeza de la serpiente y la comida
@@ -52,7 +54,13 @@ def calculate_direction(snake_position, food_position, previous_move, snake_body
             else:
                 return 'down'
 
-
+def shortest_path(graph, start, end):
+    if not graph.has_node(start) or not graph.has_node(end):
+        return None
+    try:
+        return nx.shortest_path(graph, start, end)
+    except nx.NetworkXNoPath:
+        return None
 
 
 def a_star(graph, start, goal):
@@ -126,3 +134,26 @@ def move(previous_move, path, start):
         print(previous_move)
         print(node)
     return(previous_move)
+
+def next_move(current_position, path):
+    print(path)
+    if not path or current_position not in path:
+        return None
+
+    current_index = path.index(current_position)
+    
+    if current_index + 1 >= len(path):
+        return None
+
+    next_position = path[current_index + 1]
+    row_diff = next_position[0] - current_position[0]
+    col_diff = next_position[1] - current_position[1]
+
+    if col_diff == 1:
+        return "down"
+    elif col_diff == -1:
+        return "up"
+    elif row_diff == 1:
+        return "right"
+    elif row_diff == -1:
+        return "left"

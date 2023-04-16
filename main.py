@@ -10,9 +10,10 @@ import cv2
 import numpy as np
 from calculate_direction import *
 from PIL import Image, ImageFilter
-import numpy as np
 from Coordenadas_Snake import *
 from Coordenadas_Fruta import find_food
+import networkx as nx
+
 # Inicializar el navegador
 driver = webdriver.Chrome()
 
@@ -20,7 +21,7 @@ driver = webdriver.Chrome()
 driver.get("https://www.google.com/fbx?fbx=snake_arcade")
 
 # Esperar a que la página cargue completamente
-driver.implicitly_wait(100)
+driver.implicitly_wait(100000)
 
 # Localizar el elemento canvas
 play_button = driver.find_element(By.CLASS_NAME,"FL0z2d.Uxkl7b")
@@ -41,29 +42,36 @@ snake_length =3
 previous_fruit = (12,7)
 snake_position_list = []
 previous_snake = None
-previous_fruit = None
 cell_size = 32
-def generate_graph():
-    # Define the dimensions of the board and the cell size
+def create_graph_from_grid():
+    graph = nx.Graph()
+    for i in range(cell_size // 2, width-32, cell_size):
+        for j in range(cell_size // 2, height-32, cell_size-1):
+            node = (i//cell_size, j//cell_size)
+            if (node not in snake_position_list and node != snake_position_list[len(snake_position_list)-1]):
+                graph.add_node(node)
+                if i//cell_size > 0 and (node not in snake_position_list and node != snake_position_list[len(snake_position_list)-1]):
+                    graph.add_edge(node, ((i//cell_size)-1, j//cell_size))
+                if j//cell_size > 0 and (node not in snake_position_list and node != snake_position_list[len(snake_position_list)-1]):
+                    graph.add_edge(node, (i//cell_size, (j//cell_size)-1))
+    return graph
 
+def generate_graph():
     # Initialize the graph
     graph = {}
     # Loop through the cells and add nodes to the graph
     for x in range(cell_size // 2, width-32, cell_size):
         for y in range(cell_size // 2, height-32, cell_size-1):
-           r, g, b, a = pixels[x, y]
-           #print(x//32,y//32, r,g,b)
-           if ((r < 215 or r > 230) and (g < 105 or g > 140)):
             node = (x // cell_size, y // cell_size)
-            graph[node] = {} 
+            if (node not in snake_position_list and node != snake_position_list[len(snake_position_list)-1]):
+                graph[node] = {} 
                 # Check the neighboring cells to find connections
-            for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
-                nx, ny = x + dx * cell_size, y + dy * cell_size
-                if 0 <= nx < width-32 and 0 <= ny < height-32:
-                    r, g, b, a = pixels[nx, ny]
-                    if ((r < 215 or r > 240) and (g < 105 or g > 140)):
+                for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+                    nx, ny = x + dx * cell_size, y + dy * cell_size
+                    if 0 <= nx < width-32 and 0 <= ny < height-32:
                         neighbor = (nx // cell_size, ny // cell_size)
-                        graph[node][neighbor] = 1
+                        if (neighbor not in snake_position_list) and (neighbor != snake_position_list[len(snake_position_list)-1]):
+                            graph[node][neighbor] = 1
     #for node, neighbors in graph.items():
         #print(f"Node {node}:")
         #for neighbor, cost in neighbors.items():
@@ -88,6 +96,7 @@ def draw_graph_on_image(graph, image_path):
     cv2.imshow('Game Image', img)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
+
 def find_snake_pixels(ci):
     pixels = ci.load()
     snake_pixels = []
@@ -109,7 +118,7 @@ while True:
     box = (28, 25, width, height)
     ci = canvas_image.crop(box)
     snake = snake_position(ci)
-    snake_pixel=find_snake_pixels(ci)
+    #snake_pixel = find_snake_pixels(ci)
     fruit = find_food(ci)
     if fruit != previous_fruit:
         snake_length += 1
@@ -120,9 +129,69 @@ while True:
             snake_position_list.append(snake)
         else:
             # Mover todas las posiciones hacia la izquierda, eliminando el primer elemento
-            snake_position_list.pop(0)
-            snake_position_list.append(snake)
+            for i in range (1, len(snake_position_list)):
+                snake_position_list[i-1] = snake_position_list[i]
+            snake_position_list[len(snake_position_list)-1] = snake
+        if snake!=previous_snake:
+            previous_snake = snake
+            pixels = ci.load()
+            #ci.show()
 
+            current_image = np.array(ci)
+            if previous_image is not None:
+                previous_image = np.array(previous_image)
+
+                difference = np.sum(np.abs(current_image - previous_image))
+                
+                if difference != 0:
+                    previous_image = ci
+                    #print("El canvas ha cambiado")
+
+                # Guardar la imagen actual para la próxima comparación
+                
+                print ("snake: ", snake)
+                print ("fruit: ", fruit)
+                print ("spl: ", snake_position_list)
+                graph = create_graph_from_grid()
+                if fruit is not None:
+                        #direction = a_star(graph, snake_position, food_position)
+                            
+                            #direction = calculate_direction(direction, snake_position, food_position)
+                                astar = shortest_path(graph, snake, fruit)
+                            #print(astar)
+                                previous_move = next_move(snake,astar)
+                                #previous_move = calculate_direction(snake, fruit, previous_move,snake_position_list)
+                                
+                                print(previous_move)
+                            
+                            
+                        #pyautogui.press(direction)
+                        #pyautogui.press("space")
+
+                        #print("Posición de la comida: ", food_position)
+                    #print("Posición de la snake: ", snake_position)
+                else:
+                    print("No se encontró comida en la imagen.")
+                # Emitir una orden de movimiento a la serpiente para que se mueva en la dirección adecuada
+            previous_image = ci
+            if previous_move == "right":
+                ActionChains(driver)\
+                .key_down(Keys.ARROW_RIGHT)\
+                .perform()
+            elif previous_move == "left":
+                ActionChains(driver)\
+                .key_down(Keys.ARROW_LEFT)\
+                .perform()
+            elif previous_move == "up":
+                ActionChains(driver)\
+                .key_down(Keys.ARROW_UP)\
+                .perform()
+            elif previous_move == "down":
+                ActionChains(driver)\
+                .key_down(Keys.ARROW_DOWN)\
+                .perform()
+
+        '''
         if previous_snake is not None:
             if snake[0] != previous_snake[0]:
                 # Añadir la nueva posición en el eje y
@@ -138,65 +207,10 @@ while True:
                     position = (x, snake[1])
                     if position not in snake_position_list:
                         snake_position_list.append(position)
-
-        previous_snake = snake
+        '''
 
     # Mostrar la imagen resultante
-    pixels = ci.load()
-    #ci.show()
-
-    current_image = np.array(ci)
-    if previous_image is not None:
-        previous_image = np.array(previous_image)
-
-        difference = np.sum(np.abs(current_image - previous_image))
-        
-        #if difference != 0:
-            #print("El canvas ha cambiado")
-
-        # Guardar la imagen actual para la próxima comparación
-        previous_image = ci
-        graph = generate_graph()
-        print ("snake: ", snake)
-        print ("fruit: ", fruit)
-        if fruit is not None:
-                #direction = a_star(graph, snake_position, food_position)
-                    try:
-                    #direction = calculate_direction(direction, snake_position, food_position)
-                        #astar=a_star(graph, snake, fruit)
-                    #print(astar)
-                        #previous_move = move(previous_move,astar)
-                        previous_move = calculate_direction(snake, fruit, previous_move,snake_position_list)
-                        
-                        print(previous_move)
-                       
-                    except:
-                        continue
-                #pyautogui.press(direction)
-                #pyautogui.press("space")
-
-                #print("Posición de la comida: ", food_position)
-            #print("Posición de la snake: ", snake_position)
-        else:
-            print("No se encontró comida en la imagen.")
-        # Emitir una orden de movimiento a la serpiente para que se mueva en la dirección adecuada
-    previous_image = ci
-    if previous_move == "right":
-        ActionChains(driver)\
-        .key_down(Keys.ARROW_RIGHT)\
-        .perform()
-    elif previous_move == "left":
-        ActionChains(driver)\
-        .key_down(Keys.ARROW_LEFT)\
-        .perform()
-    elif previous_move == "up":
-        ActionChains(driver)\
-        .key_down(Keys.ARROW_UP)\
-        .perform()
-    elif previous_move == "down":
-        ActionChains(driver)\
-        .key_down(Keys.ARROW_DOWN)\
-        .perform()
+    
 
 # Dibujar la cuadrícula en el canvas
 
