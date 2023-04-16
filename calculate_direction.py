@@ -55,12 +55,37 @@ def calculate_direction(snake_position, food_position, previous_move, snake_body
                 return 'down'
 
 def shortest_path(graph, start, end):
+    for node in graph.nodes():
+        neighbors = list(graph.neighbors(node))
+        print(f"Nodo: {node} -> Vecinos: {neighbors}")
     if not graph.has_node(start) or not graph.has_node(end):
         return None
+
     try:
-        return nx.shortest_path(graph, start, end)
+        path = nx.shortest_path(graph, start, end)
     except nx.NetworkXNoPath:
         return None
+
+    moves = {}
+    for i in range(len(path) - 1):
+        current_position = path[i]
+        next_position = path[i + 1]
+        col_diff = next_position[0] - current_position[0]
+        row_diff = next_position[1] - current_position[1]
+
+        if row_diff == 1:
+            move = "down"
+        elif row_diff == -1:
+            move = "up"
+        elif col_diff == 1:
+            move = "right"
+        elif col_diff == -1:
+            move = "left"
+
+        moves[current_position] = move
+
+    moves[path[-1]] = "goal"
+    return moves
 
 
 def a_star(graph, start, goal):
@@ -139,21 +164,6 @@ def next_move(current_position, path):
     print(path)
     if not path or current_position not in path:
         return None
-
-    current_index = path.index(current_position)
-    
-    if current_index + 1 >= len(path):
-        return None
-
-    next_position = path[current_index + 1]
-    row_diff = next_position[0] - current_position[0]
-    col_diff = next_position[1] - current_position[1]
-
-    if col_diff == 1:
-        return "down"
-    elif col_diff == -1:
-        return "up"
-    elif row_diff == 1:
-        return "right"
-    elif row_diff == -1:
-        return "left"
+    if path.get(current_position) !="goal"  :
+        return path.get(current_position)
+    return
