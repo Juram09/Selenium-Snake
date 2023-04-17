@@ -3,9 +3,10 @@ import numpy as np
 import numpy as np
 import numpy as np
 import networkx as nx
+import heapq
 
 def calculate_direction(snake_position, food_position, previous_move, snake_body):
-    print(snake_body)
+    #print(snake_body)
     # Obtener la posición de la cabeza de la serpiente y la comida
     x1, y1 = snake_position
     x2, y2 = food_position
@@ -55,9 +56,12 @@ def calculate_direction(snake_position, food_position, previous_move, snake_body
                 return 'down'
 
 def shortest_path(graph, start, end):
+    #Read nodes and neighbors
+    '''
     for node in graph.nodes():
         neighbors = list(graph.neighbors(node))
         print(f"Nodo: {node} -> Vecinos: {neighbors}")
+    '''
     if not graph.has_node(start) or not graph.has_node(end):
         return None
 
@@ -89,54 +93,47 @@ def shortest_path(graph, start, end):
 
 
 def a_star(graph, start, goal):
-    # Creamos una cola de prioridad y agregamos el nodo inicial con una prioridad de 0
-    queue = PriorityQueue()
-    queue.put((0, start))
-    
-    # Diccionario que almacena los nodos visitados y su predecesor
-    visited = {start: None}
-    
-    # Diccionario que almacena los costos desde el inicio hasta cada nodo
-    g_score = {start: 0}
-    
-    # Loop principal del algoritmo
-    while not queue.empty():
-        # Extraemos el nodo con menor costo
-        current_cost, current_node = queue.get()
-        
-        # Si llegamos al nodo objetivo, construimos y devolvemos el camino
-        if current_node == goal:
-            path = []
-            while current_node is not None:
-                path.append(current_node)
-                current_node = visited[current_node]
-            return list(reversed(path))
-        
-        # Expandimos el nodo actual y revisamos sus vecinos
-        for neighbor, weight in graph[current_node].items():
-            # Si el vecino no es transitble, lo ignoramos
-            if weight == 0:
-                continue
-            
-            # Calculamos el costo desde el inicio hasta el vecino a través del nodo actual
-            tentative_g_score = g_score[current_node] + weight
-            
-            # Si el vecino ya ha sido visitado y el costo desde el inicio es menor que el calculado
-            # anteriormente, lo ignoramos
-            if neighbor in g_score and tentative_g_score >= g_score[neighbor]:
-                continue
-            
-            # Si el vecino no ha sido visitado o el costo desde el inicio es menor que el calculado
-            # anteriormente, lo agregamos a la cola de prioridad y actualizamos la información
-            visited[neighbor] = current_node
-            g_score[neighbor] = tentative_g_score
-            f_score = tentative_g_score + heuristic(neighbor, goal)
-            queue.put((f_score, neighbor))
-    
-    # Si no se encuentra un camino, se devuelve None
-    return None
-def heuristic(a, b):
-    return np.abs(a[0] - b[0]) + np.abs(a[1] - b[1])
+    frontier = [(0, start)]
+    came_from = {start: None}
+    cost_so_far = {start: 0}
+
+    while frontier:
+        current = heapq.heappop(frontier)[1]
+
+        if current == goal:
+            break
+
+        for next in graph.neighbors(current):
+            new_cost = cost_so_far[current] + 1
+            if next not in cost_so_far or new_cost < cost_so_far[next]:
+                cost_so_far[next] = new_cost
+                priority = new_cost + manhattan_distance(goal, next)
+                heapq.heappush(frontier, (priority, next))
+                came_from[next] = current
+
+    path_dict = {}
+    if goal in came_from:
+        # Invertir las claves y valores en el diccionario 'came_from'
+        came_from_reversed = {v: k for k, v in came_from.items() if v is not None}
+
+        node = start
+        while node != goal:
+            next_node = came_from_reversed[node]
+            if next_node[0] < node[0]:
+                direction = "up"
+            elif next_node[0] > node[0]:
+                direction = "down"
+            elif next_node[1] < node[1]:
+                direction = "left"
+            else:
+                direction = "right"
+            path_dict[node] = direction
+            node = next_node
+
+    return path_dict
+
+def manhattan_distance(a, b):
+    return abs(a[0] - b[0]) + abs(a[1] - b[1])
 
 def move(previous_move, path, start):
     print(path)
@@ -164,6 +161,6 @@ def next_move(current_position, path):
     print(path)
     if not path or current_position not in path:
         return None
-    if path.get(current_position) !="goal"  :
+    if current_position !="goal"  :
         return path.get(current_position)
     return

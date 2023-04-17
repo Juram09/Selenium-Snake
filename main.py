@@ -21,7 +21,7 @@ driver = webdriver.Chrome()
 driver.get("https://www.google.com/fbx?fbx=snake_arcade")
 
 # Esperar a que la página cargue completamente
-driver.implicitly_wait(1000)
+driver.implicitly_wait(10000)
 
 # Localizar el elemento canvas
 play_button = driver.find_element(By.CLASS_NAME,"FL0z2d.Uxkl7b")
@@ -137,6 +137,7 @@ while True:
     if fruit != previous_fruit:
         snake_length += 1
         previous_fruit = fruit
+    #snake = snake_position(ci)
     snake = eyes_position(ci)
     #snake_pixel = find_snake_pixels(ci)
 
@@ -167,8 +168,8 @@ while True:
         
             
             
-        print ("snake: ", snake)
-        print ("fruit: ", fruit)
+        #print ("snake: ", snake)
+        #print ("fruit: ", fruit)
         print ("spl: ", snake_position_list)
         graph = create_graph_from_grid()
         if fruit is not None:
@@ -181,7 +182,7 @@ while True:
                         previous_move = next_move(snake,astar)
                         #previous_move = calculate_direction(snake, fruit, previous_move,snake_position_list)
                         
-                        print(previous_move)
+                        #print(previous_move)
                     
                     
                 #pyautogui.press(direction)
