@@ -7,14 +7,13 @@ from PIL import Image, ImageDraw
 import io
 import base64
 import cv2
-import numpy as np
-from calculate_direction import move, a_star
+import numpy as nps
 from PIL import Image, ImageFilter
 import numpy as np
 
 
 cell_size=32
-
+'''
 def snake_position(ci):
     # Convertir la imagen a formato HSV
     hsv_image = cv2.cvtColor(np.array(ci), cv2.COLOR_RGB2HSV)
@@ -47,7 +46,7 @@ def snake_position(ci):
     # Si no se detectó ningún contorno, devolver None
     return None
 
-
+'''
 def eyes_position(ci):
     # Convertir la imagen a formato HSV
     hsv_image = cv2.cvtColor(np.array(ci), cv2.COLOR_RGB2HSV)

@@ -10,7 +10,7 @@ import cv2
 import numpy as np
 from calculate_direction import *
 from PIL import Image, ImageFilter
-from Coordenadas_Snake import *
+from Coordenadas_Snake import eyes_position
 from Coordenadas_Fruta import find_food
 import networkx as nx
 
@@ -71,32 +71,7 @@ def create_graph_from_grid():
                 if x < width-32 and right not in snake_position_list:
                     graph.add_edge(node, right)
     return graph
-
-def generate_graph():
-    # Initialize the graph
-    graph = {}
-    # Loop through the cells and add nodes to the graph
-    for x in range(cell_size // 2, width-32, cell_size):
-        for y in range(cell_size // 2, height-32, cell_size-1):
-            node = (x // cell_size, y // cell_size)
-            if (node not in snake_position_list and node != snake_position_list[len(snake_position_list)-1]):
-                graph[node] = {} 
-                # Check the neighboring cells to find connections
-                for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
-                    nx, ny = x + dx * cell_size, y + dy * cell_size
-                    if 0 <= nx < width-32 and 0 <= ny < height-32:
-                        neighbor = (nx // cell_size, ny // cell_size)
-                        if (neighbor not in snake_position_list) and (neighbor != snake_position_list[len(snake_position_list)-1]):
-                            graph[node][neighbor] = 1
-    #for node, neighbors in graph.items():
-        #print(f"Node {node}:")
-        #for neighbor, cost in neighbors.items():
-           #print(f"  -> Neighbor {neighbor} (cost {cost})")#g = draw_graph_on_image(graph, ci)
-    #g = draw_graph_on_image(graph,ci)
-    #print(snake)
-    return graph
-
-
+'''
 def draw_graph_on_image(graph, image_path):
     # Load the original image
     image = image_path
@@ -112,18 +87,7 @@ def draw_graph_on_image(graph, image_path):
     cv2.imshow('Game Image', img)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
-
-def find_snake_pixels(ci):
-    pixels = ci.load()
-    snake_pixels = []
-    for x in range(ci.width):
-        for y in range(ci.height):
-            r, g, b, a = pixels[x, y]
-            if r == 0 and g == 255 and b == 0:
-                snake_pixels.append((x, y))
-    return snake_pixels
-
-
+'''
 previous_move="right"
 while True:
     width = 18*cell_size-4
@@ -169,8 +133,9 @@ while True:
             
             
         #print ("snake: ", snake)
-        #print ("fruit: ", fruit)
-        print ("spl: ", snake_position_list)
+        #
+        # print ("fruit: ", fruit)
+        #print ("spl: ", snake_position_list)
         graph = create_graph_from_grid()
         if fruit is not None:
                 #direction = a_star(graph, snake_position, food_position)
@@ -234,5 +199,4 @@ while True:
 
 # Dibujar la cuadrícula en el canvas
 
-# Esperar un momento para ver la cuadrícula
-time.sleep(5)
+# Esperar un momento para ver la cuadrícula            
